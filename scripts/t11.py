@@ -5,10 +5,53 @@ import numpy as np
 import pinocchio as pin
 import tf.transformations as tr
 from std_msgs.msg import String
+import tf.transformations as tr
+
+def create_cube():
+    cage = []
+    # Coordinate frames  at the corners
+    corner_1_offset = np.array([-0.5, -0.4, -0.4])
+    corner_2_offset = np.array([0.5, -0.4, -0.4])
+    corner_3_offset = np.array([0.5, 0.4, -0.4])
+    corner_4_offset = np.array([-0.5, 0.4,-0.4])
+    corner_5_offset = np.array([-0.5, -0.4, 0.4])
+    corner_6_offset = np.array([0.5, -0.4, 0.4])
+    corner_7_offset = np.array([0.5, 0.4, 0.4])
+    corner_8_offset = np.array([-0.5, 0.4, 0.4])
+    center_offset = np.array([0.0, 0.0, 0.0])
+
+    # Coordinate Frames 
+    frame_rotation_1 = np.eye(3)
+    frame_rotation_2 = np.array([0, -1, 0],[1, 0, 0],[0, 0, 1])
+    frame_rotation_3 = np.array([-1, 0, 0],[0, -1, 0],[0, 0, 1])
+    frame_rotation_4 = np.array([0, 1, 0],[-1, 0, 0],[0, 0, 1])
+    frame_rotation_5 = np.array([0, 1, 0],[1, 0, 0],[0, 0, -1])
+    frame_rotation_6 = np.array([-1, 0, 0],[0, 1, 0],[0, 0, -1])
+    frame_rotation_7 = np.array([0, -1, 0],[-1, 0, 0],[0, 0, -1])
+    frame_rotation_8 = np.array([1, 0, 0],[0,-1, 0],[0, 0,-1])
+    frame_rotation_center = np.eye(3)
+
+    cage = [pin.SE3(frame_rotation_center,center_offset),
+            pin.SE3(frame_rotation_1,corner_1_offset),
+            pin.SE3(frame_rotation_2,corner_2_offset),
+            pin.SE3(frame_rotation_3,corner_3_offset),
+            pin.SE3(frame_rotation_4,corner_4_offset),
+            pin.SE3(frame_rotation_5,corner_5_offset),
+            pin.SE3(frame_rotation_6,corner_6_offset),
+            pin.SE3(frame_rotation_7,corner_7_offset),
+            pin.SE3(frame_rotation_8,corner_8_offset)]
+    
+    return  cage
+
  
 def cage():
     pub = rospy.Publisher('chatter', String, queue_size=10)
     rospy.init_node('cage', anonymous=True)
+    
+    cage = create_cube()
+    print(cage)
+    
+
     while not rospy.is_shutdown():
         hello_str = "hello world %s" % rospy.get_time()
         rospy.loginfo(hello_str)
@@ -17,43 +60,8 @@ def cage():
 
 if __name__ == '__main__':
     try:
-        talker()
+        print(create_cube)
+        cage()
+
     except rospy.ROSInterruptException:
         pass
-
-#Numpy basics
-a =  np.array([[1,0.5],[0,1]])
-b =  np.array([[1,2],[1,1]])
-I = np.eye(2)
-
-print("I: \n", I)
-print("a: \n", a)
-print("aT: \n", np.transpose(a))
-print("a^(-1): \n", np.linalg.inv(a))
-print("a^(-1) * a: \n", np.linalg.inv(a)@a)
-print("a+b: \n", a+b)
-print("a-b: \n", a-b)
-
-# pinnocchio basics
-R = pin.AngleAxis(np.pi/4,np.array([0,1,0])).toRotationMatrix()
-print("R: \n", R)
-X = pin.SE3(R,np.array([1, 0, 0]))
-print("X: \n", X)
-print("X: \n", X.action)
-
-w = np.array([0, 1, 0])
-v = np.array([0.5, 0, 0])
-V = pin.Motion(v,w)
-print("V: \n ", V)
-
-f = np.array([0, 1, 0])
-t = np.array([0.5, 0, 0])
-F = pin.Force(f,t)
-print("F: \n ", F)
-
-V1 = X*V
-print("V1: \n ", V1)
-
-F1 = X*F
-print("F1: \n ", F1)
-

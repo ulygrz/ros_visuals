@@ -13,11 +13,14 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   visualization_msgs
+  pinocchio
 )
 
+find_package(pinocchio REQUIRED)
 ## System dependencies are found with CMake's conventions
-# find_package(Boost REQUIRED COMPONENTS system)
-
+#target_compile_definitions(${PROJECT_NAME} PRIVATE ${PINOCCHIO_CFLAGS_OTHER})
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(pinocchio REQUIRED pinocchio)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -119,6 +122,7 @@ catkin_package(
 ## Your package locations should be listed before other locations
 include_directories(
 # include
+  ${pinocchio_DIR} /opt/openrobots
   ${catkin_INCLUDE_DIRS}
 )
 
@@ -146,11 +150,15 @@ include_directories(
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
+#add_dependencies(pinocchio_DIR /opt/openrobots/lib/cmake/pinocchio)
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(${PROJECT_NAME}_node
-#   ${catkin_LIBRARIES}
-# )
+#target_link_libraries(
+#  ${PROJECT_NAME}_node
+#  ${PROJECT_NAME} pinocchio::pinocchio
+#  ${catkin_LIBRARIES}
+#)
+
+
 
 #############
 ## Install ##
